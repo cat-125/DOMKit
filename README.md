@@ -19,8 +19,9 @@ This documentation provides an overview of the DOMKit and its components. This f
 # Installation
 To use this framework, simply include the JavaScript file containing the framework classes in your project.
 ```html
-<script src="path/to/domkit.js"></script>
+<script src="path/to/domkit.js" type="module"></script>
 ```
+> **Note**: you can import it not as module, nut this is not recommended.
 
 # Usage
 To use the framework, create instances of the desired components and add them to other components or the DOM.
