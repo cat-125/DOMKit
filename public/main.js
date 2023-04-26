@@ -1,5 +1,4 @@
-import { View } from './domkit/view.js';
-import { Element } from './domkit/element.js';
+import { View, Element } from './domkit/domkit.js';
 import { UIContainer, UIButton, UIList } from './domkit/uikit.js';
 import { TextTransformer } from './domkit/texttransformer.js';
 
@@ -14,12 +13,15 @@ class MainView extends View {
 		const list = new UIList();
 		list.addClass('divided');
 
-		const button = new UIButton('Tap Me!');
+		const button = new UIButton('Click Me!');
 		button
 			.addClass('primary')
 			.addClass('fluid')
-			.onClick(() => list.addItem('You clicked the button!'))
-			.onLongClick(() => list.addItem('You holded the button!'));
+			.onClick(() => {
+				list.addItem(`You clicked the button!`);
+				counter++;
+				label.setText(counter);
+			});
 
 		container.addSubview(label);
 		container.addSubview(button);

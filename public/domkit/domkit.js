@@ -1,4 +1,6 @@
-import { animateElement } from './functions.js';
+import { getDocument, animateElement } from './functions.js';
+
+const document = getDocument()
 
 export class Element {
 	constructor(el = 'div') {
@@ -111,18 +113,18 @@ export class Element {
 		this.el.addEventListener('mouseleave', handleMouseUp);
 		return this;
 	}
-	
+
 	// Styles
 	animate(properties, duration = 300) {
 		animateElement(this.el, properties, duration);
 		return this;
 	}
-	
+
 	hide() {
 		this.el.hidden = true;
 		return this;
 	}
-	
+
 	show() {
 		this.el.hidden = false;
 		return this;
@@ -162,3 +164,23 @@ export class Element {
 
 	// TODO: Methods for some other styles
 }
+
+export class View {
+	constructor(root, doc = document) {
+		if (!root) {
+			throw new Error('Root element is not defined');
+		}
+		this.root = typeof root === 'string' ? document.querySelector(root) : root;
+		this.document = doc || document;
+		this.document.addEventListener('DOMContentLoaded', this.viewDidLoad.bind(this));
+	}
+
+	addSubview(view) {
+		// Check if view is html element or not
+		this.root.appendChild(view instanceof Element ? view.el : view);
+	}
+
+	viewDidLoad() { }
+}
+
+if (typeof module !== 'undefined' && module.exports) module.exports = { Element, View };

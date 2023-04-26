@@ -1,6 +1,8 @@
+import { getDocument } from './functions.js';
+
 export class TextTransformer {
 	constructor(el) {
-		this.el = typeof el === 'string' ? document.querySelector(el) : el;
+		this.el = typeof el === 'string' ? getDocument().querySelector(el) : el;
 	}
 
 	print(text, delay) {

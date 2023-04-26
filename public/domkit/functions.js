@@ -1,3 +1,11 @@
+export function getDocument() {
+	let doc = document || (typeof window !== 'undefined' ? window.document : undefined);
+	if (typeof doc === 'undefined' && typeof module !== 'undefined') {
+		doc = require('jsdom').JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
+	}
+	return doc;
+}
+
 export function animateElement(element, properties, duration) {
 	let startValues = {};
 	let endValues = {};

@@ -1,4 +1,4 @@
-import { Element } from './element.js';
+import { Element } from './domkit.js';
 
 class UIButton extends Element {
 	constructor(text) {
