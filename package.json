@@ -1,0 +1,19 @@
+{
+  "name": "domkit",
+  "version": "1.0.0",
+  "description": "Framework to easily create beautiful websites",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "keywords": [
+    "websites",
+    "dom",
+    "kit",
+    "domkit",
+    "sites",
+    "site"
+  ],
+  "author": "Cat125",
+  "license": "MIT"
+}
