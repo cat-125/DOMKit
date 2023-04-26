@@ -65,6 +65,12 @@ class UIInput extends Element {
 		const input = this.input = new Element('input');
 		this.addClass('input').addSubview(input);
 	}
+	
+	val(val) {
+		if (!val) return this.input.el.value;
+		this.input.el.value = val;
+		return this;
+	}
 }
 
 class UISelect extends Element {
