@@ -4,7 +4,7 @@ const document = getDocument()
 
 export class Element {
 	constructor(el = 'div') {
-		this.el = document.createElement(el);
+		this.el = (typeof el === 'string') ? getDocument().createElement(el) : el;
 		this.id = this.el.id;
 	}
 
@@ -171,8 +171,8 @@ export class View {
 			throw new Error('Root element is not defined');
 		}
 		this.root = typeof root === 'string' ? document.querySelector(root) : root;
-		this.document = doc || document;
-		this.document.addEventListener('DOMContentLoaded', this.viewDidLoad.bind(this));
+		this.document = doc || getDocument();
+		this.document.addEventListener('DOMContentLoaded', this.viewDidLoad.bind(this, this.document));
 	}
 
 	addSubview(view) {
