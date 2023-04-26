@@ -21,7 +21,7 @@ To use this framework, simply include the JavaScript file containing the framewo
 ```html
 <script src="path/to/domkit.js" type="module"></script>
 ```
-> **Note**: you can import it not as module, nut this is not recommended.
+> **Note**: you can import it not as module, but this is not recommended.
 
 # Usage
 To use the framework, create instances of the desired components and add them to other components or the DOM.
