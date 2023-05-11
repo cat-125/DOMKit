@@ -2,8 +2,40 @@ import { getDocument, animateElement } from './functions.js';
 
 const document = getDocument()
 
-export class Element {
+class SupportsEvents {
+	constructor() {
+		this.listeners = {};
+	}
+
+	addEventListener(event, listener) {
+		if (!this.listeners[event]) {
+			this.listeners[event] = [];
+		}
+		this.listeners[event].push(listener);
+	}
+
+	removeEventListener(event, listener) {
+		if (this.listeners[event]) {
+			const index = this.listeners[event].indexOf(listener);
+			if (index !== -1) {
+				this.listeners[event].splice(index, 1);
+			}
+		}
+	}
+
+	dispatchEvent(event) {
+		if (this.listeners[event.type]) {
+			this.listeners[event.type].forEach(listener => {
+				listener.call(this, event);
+			});
+		}
+	}
+}
+
+
+export class Element extends SupportsEvents {
 	constructor(el = 'div') {
+		super();
 		this.el = (typeof el === 'string') ? getDocument().createElement(el) : el;
 		this.id = this.el.id;
 	}
@@ -180,7 +212,7 @@ export class View {
 		this.root.appendChild(view instanceof Element ? view.el : view);
 	}
 
-	viewDidLoad() { }
+	viewDidLoad() {}
 }
 
 if (typeof module !== 'undefined' && module.exports) module.exports = { Element, View };
