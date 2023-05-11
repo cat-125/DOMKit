@@ -374,7 +374,7 @@ element.onMouseMove(() => {
 });
 ```
 
-## `onLongClick(callback, delay)`
+### `onLongClick(callback, delay)`
 
 The `onLongClick` method adds a long click event listener to the element.
 
