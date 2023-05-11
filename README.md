@@ -1,16 +1,32 @@
-## Documentation
-This repository contains several JavaScript files that provide functionality for creating and animating elements on a web page.
+# Documentation
 
-## Table of Contents
+This repository contains several JavaScript files that provide functionality for easily creating elements on a web page without any additional HTML or CSS.
+
+# Table of Contents
 
 - [Documentation](#documentation)
 - [Installation](#installation)
-- [Usage](#usage)
+- ["Hello World" example](#hello-world-example)
 - [Description](#description)
   - [`domkit.js`](#domkitjs)
   - [`texttransformer.js`](#texttransformerjs)
   - [`functions.js`](#functionsjs)
 - [Details](#details)
+  - [`SupportsEvents` class](#supportsevents-class)
+  - [`Element` class](#element-class)
+  - [`View` class](#view-class)
+  - [`UIButton` class](#uibutton-class)
+  - [`UIButton` class](#uibutton-class)
+  - [`UILabel` Class](#uilabel-class)
+  - [`UIContainer` Class](#uicontainer-class)
+  - [`UIBadge` Class](#uibadge-class)
+  - [`UICard` Class](#uicard-class)
+  - [`UIInput` Class](#uiinput-class)
+  - [`UISelect` Class](#uiselect-class)
+  - [`UIList` Class](#uilist-class)
+  - [`UISegment` Class](#uisegment-class)
+  - [`UIOverlay` Class](#uioverlay-class)
+
 
 ## Installation
 
@@ -22,7 +38,7 @@ To use the functionality provided by these JavaScript files, you can include the
 <script src="path/to/functions.js"></script>
 ```
 
-## "Hello World" Example
+# "Hello World" Example
 
 Here's an example of how to use the DOMKit to create a simple "Hello World" application:
 
