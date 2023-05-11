@@ -1,5 +1,14 @@
 import { Element } from './domkit.js';
 
+const cssFileUrl = 'domkit/css/splash.min.css';
+
+if (!document.querySelector(`link[href="${cssFileUrl}"]`)) {
+	const link = document.createElement('link');
+	link.rel = 'stylesheet';
+	link.href = cssFileUrl;
+	document.head.appendChild(link);
+}
+
 class UIButton extends Element {
 	constructor(text) {
 		super('button');
@@ -65,7 +74,7 @@ class UIInput extends Element {
 		const input = this.input = new Element('input');
 		this.addClass('input').addSubview(input);
 	}
-	
+
 	val(val) {
 		if (!val) return this.input.el.value;
 		this.input.el.value = val;
