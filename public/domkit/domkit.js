@@ -3,34 +3,50 @@ import { getDocument, animateElement } from './functions.js';
 const document = getDocument()
 
 class SupportsEvents {
-	constructor() {
-		this.listeners = {};
-	}
+  constructor() {
+    this.listeners = {};
+  }
 
-	addEventListener(event, listener) {
-		if (!this.listeners[event]) {
-			this.listeners[event] = [];
-		}
-		this.listeners[event].push(listener);
-	}
+  addEventListener(event, listener, options = {}) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push({
+      listener,
+      options
+    });
+  }
 
-	removeEventListener(event, listener) {
-		if (this.listeners[event]) {
-			const index = this.listeners[event].indexOf(listener);
-			if (index !== -1) {
-				this.listeners[event].splice(index, 1);
-			}
-		}
-	}
+  removeEventListener(event, listener) {
+    if (this.listeners[event]) {
+      const index = this.listeners[event].findIndex(item => item.listener === listener);
+      if (index !== -1) {
+        this.listeners[event].splice(index, 1);
+      }
+    }
+  }
 
-	dispatchEvent(event) {
-		if (this.listeners[event.type]) {
-			this.listeners[event.type].forEach(listener => {
-				listener.call(this, event);
-			});
-		}
-	}
+  dispatchEvent(event) {
+    if (this.listeners[event.type]) {
+      this.listeners[event.type].forEach(item => {
+        const { listener, options } = item;
+        if (options.once) {
+          this.removeEventListener(event.type, listener);
+        }
+        if (options.capture) {
+          listener.call(this, event);
+        }
+      });
+      this.listeners[event.type].forEach(item => {
+        const { listener, options } = item;
+        if (!options.capture) {
+          listener.call(this, event);
+        }
+      });
+    }
+  }
 }
+
 
 
 export class Element extends SupportsEvents {
