@@ -38,6 +38,9 @@ export class Element extends SupportsEvents {
 		super();
 		this.el = (typeof el === 'string') ? getDocument().createElement(el) : el;
 		this.id = this.el.id;
+		this.el.addEventListener('any', event => {
+			this.dispatchEvent(event);
+		});
 	}
 
 	setText(content) {
