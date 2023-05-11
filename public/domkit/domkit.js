@@ -140,9 +140,8 @@ export class Element extends SupportsEvents {
 		return this;
 	}
 
-	onLongClick(callback) {
+	onLongClick(callback, delay = 500) {
 		let timeoutId;
-		const delay = 500;
 
 		const handleStart = () => {
 			timeoutId = setTimeout(() => {
