@@ -30,11 +30,11 @@ class SupportsEvents {
 		if (this.listeners[event.type]) {
 			this.listeners[event.type].forEach(item => {
 				const { listener, options } = item;
-	
+
 				if (options.once) {
 					this.removeEventListener(event.type, listener);
 				}
-	
+
 				listener.call(this, event);
 			});
 		}
@@ -140,22 +140,26 @@ export class Element extends SupportsEvents {
 		return this;
 	}
 
-	onLongClick(callback, delay = 500) {
+	onLongClick(callback) {
 		let timeoutId;
+		const delay = 500;
 
-		const handleMouseDown = () => {
+		const handleStart = () => {
 			timeoutId = setTimeout(() => {
 				callback();
 			}, delay);
 		};
 
-		const handleMouseUp = () => {
+		const handleEnd = () => {
 			clearTimeout(timeoutId);
 		};
 
-		this.el.addEventListener('mousedown', handleMouseDown);
-		this.el.addEventListener('mouseup', handleMouseUp);
-		this.el.addEventListener('mouseleave', handleMouseUp);
+		this.el.addEventListener('mousedown', handleStart);
+		this.el.addEventListener('touchstart', handleStart);
+		this.el.addEventListener('mouseup', handleEnd);
+		this.el.addEventListener('touchend', handleEnd);
+		this.el.addEventListener('mouseleave', handleEnd);
+		this.el.addEventListener('touchcancel', handleEnd);
 		return this;
 	}
 
