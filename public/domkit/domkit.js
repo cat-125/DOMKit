@@ -1,4 +1,5 @@
 import { getDocument, animateElement } from './functions.js';
+import { gsap } from 'https://cdn.jsdelivr.net/npm/gsap@3.11.5/dist/gsap.min.js';
 
 const document = getDocument()
 
@@ -246,4 +247,58 @@ export class View extends SupportsEvents {
 	viewDidLoad() {}
 }
 
-if (typeof module !== 'undefined' && module.exports) module.exports = { Element, View };
+export class MultiViewManager {
+  constructor() {
+    this.views = {};
+    this.currentView = null;
+  }
+
+  addView(view) {
+    if (!(view instanceof View)) {
+      throw new Error('Invalid view');
+    }
+    this.views[view.id] = view;
+  }
+
+  switchTo(viewId) {
+    if (!this.views[viewId]) {
+      throw new Error(`View with id ${viewId} not found`);
+    }
+    const newView = this.views[viewId];
+    if (this.currentView) {
+      gsap.to(this.currentView.root, { opacity: 0, duration: 0.5, onComplete: () => {
+        this.currentView.root.style.display = 'none';
+        newView.root.style.display = 'block';
+        gsap.from(newView.root, { opacity: 0, duration: 0.5 });
+      }});
+    } else {
+      newView.root.style.display = 'block';
+      gsap.from(newView.root, { opacity: 0, duration: 0.5 });
+    }
+    this.currentView = newView;
+  }
+
+  removeView(viewId) {
+    if (!this.views[viewId]) {
+      throw new Error(`View with id ${viewId} not found`);
+    }
+    delete this.views[viewId];
+  }
+
+  destroyView(viewId) {
+    if (!this.views[viewId]) {
+      throw new Error(`View with id ${viewId} not found`);
+    }
+    this.views[viewId].destroy();
+    delete this.views[viewId];
+  }
+
+  getViewById(viewId) {
+    if (!this.views[viewId]) {
+      throw new Error(`View with id ${viewId} not found`);
+    }
+    return this.views[viewId];
+  }
+}
+
+if (typeof module !== 'undefined' && module.exports) module.exports = { SupportsEvents, Element, View, MultiViewManager };
