@@ -213,7 +213,7 @@ export class Element extends SupportsEvents {
 	// TODO: Methods for some other styles
 }
 
-export class View {
+export class View extends SupportsEvents {
 	constructor(root, doc = document) {
 		if (!root) {
 			throw new Error('Root element is not defined');
@@ -221,11 +221,26 @@ export class View {
 		this.root = typeof root === 'string' ? document.querySelector(root) : root;
 		this.document = doc || getDocument();
 		this.document.addEventListener('DOMContentLoaded', this.viewDidLoad.bind(this, this.document));
+		this.id = this.root.id;
+		if (!this.id) {
+			throw new Error("Can't get View ID")
+		}
 	}
 
 	addSubview(view) {
 		// Check if view is html element or not
 		this.root.appendChild(view instanceof Element ? view.el : view);
+		this.dispatchEvent(new CustomEvent('subViewAdded', {
+			detail: view instanceof Element ? view.el : view
+		}));
+		return this;
+	}
+
+	destroy() {
+		this.root.remove();
+		if (typeof this.onDestroy === 'function') this.onDestroy();
+		this.dispatchEvent(new Event('destroy'));
+		this.root = this.id = this.document = undefined;
 	}
 
 	viewDidLoad() {}
