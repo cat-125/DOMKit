@@ -1,5 +1,3 @@
-import { gsap } from 'https://cdn.jsdelivr.net/npm/gsap@3.11.5/dist/gsap.min.js';
-
 class Dialog {
   /**
    * Creates new dialog

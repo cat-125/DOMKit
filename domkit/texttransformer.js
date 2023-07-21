@@ -2,12 +2,12 @@ import { getDocument } from './functions.js';
 
 export class TextTransformer {
 	constructor(el) {
-		this.el = typeof el === 'string' ? getDocument().querySelector(el) : el;
+		this.ref = typeof el === 'string' ? getDocument().querySelector(el) : el;
 	}
 
 	print(text, delay) {
 		return new Promise((resolve) => {
-			const { el } = this;
+			const el = this.ref;
 			let currentText = el.textContent;
 			let i = 0;
 			const intervalId = setInterval(() => {

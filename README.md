@@ -90,13 +90,13 @@ The `UIOverlay` class has `show` and `hide` methods, which add and remove the `a
 
 This file exports the `TextTransformer` class, which provides methods for animating text on a web page.
 
-- `constructor(el)`: the constructor of the class, which takes an element `el` and saves it in the `this.el` property. If the passed-in element is a string, it gets the element from the document using the `getDocument().querySelector(el)` function.
+- `constructor(el)`: the constructor of the class, which takes an element `el` and saves it in the `this.ref` property. If the passed-in element is a string, it gets the element from the document using the `getDocument().querySelector(el)` function.
 
-- `print(text, delay)`: a method that prints the `text` on the `this.el` element with a delay of `delay` between each character. Returns a promise that resolves when the printing is complete.
+- `print(text, delay)`: a method that prints the `text` on the `this.ref` element with a delay of `delay` between each character. Returns a promise that resolves when the printing is complete.
 
 - `static print(el, text, delay)`: a static method that creates a new instance of the `TextTransformer` class with the `el` element and calls the `print` method on this instance.
 
-- `erase(delay)`: a method that erases the text on the `this.el` element with a delay of `delay` between each character. Returns a promise that resolves when the erasing is complete.
+- `erase(delay)`: a method that erases the text on the `this.ref` element with a delay of `delay` between each character. Returns a promise that resolves when the erasing is complete.
 
 - `static erase(el, delay)`: a static method that creates a new instance of the `TextTransformer` class with the `el` element and calls the `erase` method on this instance.
 

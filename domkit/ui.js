@@ -16,12 +16,101 @@ class UIButton extends Element {
 		this.setAttr('type', 'button');
 		if (text) this.setText(text);
 	}
+
+	primary(value = true) {
+		const oldVal = this.hasClass('primary');
+		if (value == oldVal) return this;
+		if (value)
+			this.addClass('primary');
+		else
+			this.removeClass('primary');
+		return this;
+	}
+
+	fluid(value = true) {
+		const oldVal = this.hasClass('fluid');
+		if (value == oldVal) return this;
+		if (value)
+			this.addClass('fluid');
+		else
+			this.removeClass('fluid');
+		return this;
+	}
+
+	opaque(value = true) {
+		const oldVal = this.hasClass('opaque');
+		if (value == oldVal) return this;
+		if (value)
+			this.addClass('opaque');
+		else
+			this.removeClass('opaque');
+		return this;
+	}
+
+	negative(value = true) {
+		const oldVal = this.hasClass('negative');
+		if (value == oldVal) return this;
+		if (value)
+			this.addClass('negative');
+		else
+			this.removeClass('negative');
+		return this;
+	}
+}
+
+class UILink extends Element {
+	constructor(text) {
+		super('a');
+		this.addClass('link');
+		if (text) this.setText(text);
+	}
+	
+	href(val) {
+		this.ref.href = val;
+	}
+
+	negative(value = true) {
+		const oldVal = this.hasClass('negative');
+		if (value == oldVal) return this;
+		if (value)
+			this.addClass('negative');
+		else
+			this.removeClass('negative');
+		return this;
+	}
+}
+
+class UIRawLink extends Element {
+	constructor(text) {
+		super('a');
+		if (text) this.setText(text);
+	}
+	
+	href(val) {
+		this.ref.href = val;
+	}
+
+	negative(value = true) {
+		const oldVal = this.hasClass('negative');
+		if (value == oldVal) return this;
+		if (value)
+			this.addClass('negative');
+		else
+			this.removeClass('negative');
+		return this;
+	}
 }
 
 class UILabel extends Element {
 	constructor(text) {
 		super('span');
 		if (text) this.setText(text);
+	}
+}
+
+class Newline extends Element {
+	constructor() {
+		super('br');
 	}
 }
 
@@ -61,9 +150,9 @@ class UICard extends Element {
 	}
 
 	addButton(button) {
-		const buttonsElement = this.el.querySelector('.buttons') || new Element('div').addClass('buttons');
+		const buttonsElement = this.ref.querySelector('.buttons') || new Element('div').addClass('buttons');
 		buttonsElement.addSubview(button);
-		if (!this.el.querySelector('.buttons')) this.addSubview(buttonsElement);
+		if (!this.ref.querySelector('.buttons')) this.addSubview(buttonsElement);
 		return this;
 	}
 }
@@ -76,8 +165,8 @@ class UIInput extends Element {
 	}
 
 	val(val) {
-		if (!val) return this.input.el.value;
-		this.input.el.value = val;
+		if (!val) return this.input.ref.value;
+		this.input.ref.value = val;
 		return this;
 	}
 }
@@ -110,9 +199,9 @@ class UIList extends Element {
 	}
 
 	removeItem(id) {
-		const item = this.el.querySelector(`.item:nth-child(${id})`);
+		const item = this.ref.querySelector(`.item:nth-child(${id})`);
 		if (item) {
-			this.el.removeChild(item);
+			this.ref.removeChild(item);
 		}
 		return this;
 	}
@@ -142,4 +231,4 @@ class UIOverlay extends Element {
 	}
 }
 
-export { UILabel, UIBadge, UICard, UIList, UIInput, UIButton, UISelect, UIOverlay, UISegment, UIContainer };
+export { Newline, UILabel, UIBadge, UICard, UIList, UIInput, UIButton, UILink, UIRawLink, UISelect, UIOverlay, UISegment, UIContainer };
