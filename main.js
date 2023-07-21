@@ -22,6 +22,10 @@ class MainView extends View {
 
 		(new UILink('Go to second view'))
 		.onClick(e => vm.switchTo(View2));
+
+		(new UIButton('Bottom fixed'))
+		.primary()
+			.fixBottom();
 	}
 }
 

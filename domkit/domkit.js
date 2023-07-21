@@ -56,7 +56,7 @@ export class Element extends SupportsEvents {
 		});
 		if (autoAdd) {
 			if (currentBuildingView)
-			currentBuildingView.addSubview(this);
+				currentBuildingView.addSubview(this);
 			else
 				buildingQueue.push(this);
 		}
@@ -226,6 +226,28 @@ export class Element extends SupportsEvents {
 		return this;
 	}
 
+	fix({ top = null, bottom = null, left = null, right = null }) {
+		this.ref.style.position = 'fixed';
+		this.ref.style.margin = '0';
+		if (top !== null)
+			this.ref.style.top = top;
+		if (bottom !== null)
+			this.ref.style.bottom = bottom;
+		if (left !== null)
+			this.ref.style.left = left;
+		if (right !== null)
+			this.ref.style.right = right;
+		return this;
+	}
+
+	fixBottom(dist = '1em') {
+		return this.fix({
+			bottom: dist,
+			left: dist,
+			right: dist
+		});
+	}
+
 	padding(val) {
 		if (val) this.ref.style.padding = val;
 		else return this.ref.getComputedStyle().padding;
@@ -256,21 +278,21 @@ export class View extends SupportsEvents {
 		const root = this.root = document.createElement('div');
 		document.body.appendChild(root);
 		this.document = doc || getDocument();
-		this.elememtQueue = [];
+		this.elementQueue = [];
 		this.loaded = false;
 		currentBuildingView = this;
 		if (document.readyState == 'interactive') {
 			this.viewDidLoad();
 			this.loaded = true;
-			while (this.elememtQueue.length) {
-				this.addSubview(this.elememtQueue.shift());
+			while (this.elementQueue.length) {
+				this.addSubview(this.elementQueue.shift());
 			}
 		} else {
 			this.document.addEventListener('DOMContentLoaded', () => {
 				this.viewDidLoad();
 				this.loaded = true;
-				while (this.elememtQueue.length) {
-					this.addSubview(this.elememtQueue.shift());
+				while (this.elementQueue.length) {
+					this.addSubview(this.elementQueue.shift());
 				}
 			});
 		}
@@ -280,7 +302,7 @@ export class View extends SupportsEvents {
 
 	addSubview(view) {
 		if (!this.loaded) {
-			this.elememtQueue.push(view);
+			this.elementQueue.push(view);
 			return this;
 		}
 		// Check if view is html element or not
@@ -316,15 +338,86 @@ export class View extends SupportsEvents {
 
 export class IntegratedView extends SupportsEvents {
 	constructor(root, doc = document) {
+		super();
+		this.root = typeof root === 'string' ? document.querySelector(root) : root;
+		if (!root) {
+			throw new Error('Root element is not defined');
+		}
+		document.body.appendChild(root);
+		this.document = doc || getDocument();
+		this.elementQueue = [];
+		this.loaded = false;
+		currentBuildingView = this;
+		if (document.readyState == 'interactive') {
+			this.viewDidLoad();
+			this.loaded = true;
+			while (this.elementQueue.length) {
+				this.addSubview(this.elementQueue.shift());
+			}
+		} else {
+			this.document.addEventListener('DOMContentLoaded', () => {
+				this.viewDidLoad();
+				this.loaded = true;
+				while (this.elementQueue.length) {
+					this.addSubview(this.elementQueue.shift());
+				}
+			});
+		}
+		this.id = generateId(16);
+		root.id = this.id;
+	}
+
+	addSubview(view) {
+		if (!this.loaded) {
+			this.elementQueue.push(view);
+			return this;
+		}
+		// Check if view is html element or not
+		this.root.appendChild(view instanceof Element ? view.ref : view);
+		this.dispatchEvent(new CustomEvent('subViewAdded', {
+			detail: view instanceof Element ? view.ref : view
+		}));
+		return this;
+	}
+
+	useContainer() {
+		this.root.classList.add('container');
+	}
+
+	destroy() {
+		this.root.remove();
+		if (typeof this.onDestroy === 'function') this.onDestroy();
+		this.dispatchEvent(new Event('destroy'));
+		this.root = this.id = this.document = undefined;
+	}
+
+	viewDidLoad() {}
+
+	static getInstance() {
+		let inst = this.prototype._instance;
+		if (!inst) {
+			inst = new this.prototype.constructor();
+			this.prototype._instance = inst;
+		}
+		return inst;
+	}
+}
+
+export class SimpleIntegratedView extends SupportsEvents {
+	constructor(root, doc = document) {
 		if (!root) {
 			throw new Error('Root element is not defined');
 		}
 		this.root = typeof root === 'string' ? document.querySelector(root) : root;
 		this.document = doc || getDocument();
-		this.document.addEventListener('DOMContentLoaded', this.viewDidLoad.bind(this, this.document));
-		this.id = this.root.id;
-		if (!this.id) {
-			throw new Error("Can't get View ID")
+		if (document.readyState == 'interactive') {
+			this.viewDidLoad();
+			this.loaded = true;
+		} else {
+			this.document.addEventListener('DOMContentLoaded', () => {
+				this.viewDidLoad();
+				this.loaded = true;
+			});
 		}
 	}
 
@@ -337,6 +430,10 @@ export class IntegratedView extends SupportsEvents {
 		return this;
 	}
 
+	useContainer() {
+		this.root.classList.add('container');
+	}
+
 	destroy() {
 		this.root.remove();
 		if (typeof this.onDestroy === 'function') this.onDestroy();
@@ -345,6 +442,10 @@ export class IntegratedView extends SupportsEvents {
 	}
 
 	viewDidLoad() {}
+	
+	getInstance() {
+		return this;
+	}
 }
 
 export class ViewManager {
