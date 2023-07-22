@@ -1,16 +1,5 @@
 import { Element, viewManager, getAutoBuild, useAutoBuild } from './domkit.js';
 
-let _abtmp = false;
-
-function pauseAB() {
-	_abtmp = getAutoBuild();
-	useAutoBuild(false);
-}
-
-function resumeAB() {
-	useAutoBuild(_abtmp);
-}
-
 export function importCSSFiles(cssFileUrls) {
 	for (const cssFileUrl of cssFileUrls)
 		if (!document.querySelector(`link[href="${cssFileUrl}"]`)) {
@@ -154,9 +143,7 @@ export class Link extends Element {
 export class Input extends Element {
 	constructor(placeholder) {
 		super('div');
-		pauseAB();
 		const input = this.input = new Element('input');
-		resumeAB();
 		this.addClass('input').addSubview(input);
 		if (placeholder) this.placeholder(placeholder);
 	}
@@ -180,11 +167,9 @@ export class Select extends Element {
 	}
 
 	addItem(text, val) {
-		pauseAB();
 		const item = new Element('option');
 		item.setText(text).setAttr('value', val);
 		this.addSubview(item);
-		resumeAB();
 		return this;
 	}
 
@@ -270,7 +255,6 @@ export class NavigationMenu extends Element {
 		backText = '< Back'
 	}) {
 		super('div');
-		pauseAB();
 		const title = this.title = (new Text(titleText)).bold();
 		this
 			.addClass('top-menu')
@@ -287,7 +271,6 @@ export class NavigationMenu extends Element {
 			});
 		} else this.addClass('cols-1');
 		this.addSubview(title);
-		resumeAB();
 	}
 
 	setTitle(text) {

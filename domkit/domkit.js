@@ -67,6 +67,7 @@ export class Element extends SupportsEvents {
 			currentBuildingView.addSubview(this);
 		else
 			buildingQueue.push(this);
+		return this;
 	}
 
 	build() {
@@ -236,7 +237,7 @@ export class Element extends SupportsEvents {
 		this.ref.classList.remove(className);
 		return this;
 	}
-	
+
 	css(a, b) {
 		if (typeof a == 'object') {
 			for (const [prop, val] of Object.entries(a)) {
@@ -333,22 +334,22 @@ export class Element extends SupportsEvents {
 }
 
 export class View extends SupportsEvents {
-	constructor(doc = document) {
+	constructor() {
 		super();
 		const root = this.root = document.createElement('div');
 		document.body.appendChild(root);
-		this.document = doc || getDocument();
 		this.elementQueue = [];
 		this.loaded = false;
-		currentBuildingView = this;
 		if (document.readyState == 'interactive') {
+			currentBuildingView = this;
 			this.viewDidLoad();
 			this.loaded = true;
 			while (this.elementQueue.length) {
 				this.addSubview(this.elementQueue.shift());
 			}
 		} else {
-			this.document.addEventListener('DOMContentLoaded', () => {
+			document.addEventListener('DOMContentLoaded', () => {
+				currentBuildingView = this;
 				this.viewDidLoad();
 				this.loaded = true;
 				while (this.elementQueue.length) {
@@ -403,18 +404,79 @@ export class View extends SupportsEvents {
 	}
 }
 
+export class MountableView extends SupportsEvents {
+	constructor() {
+		super();
+		this.root = document.createElement('div');
+		this.elementQueue = [];
+		this.loaded = false;
+		this.id = generateId(16);
+		this.root.id = this.id;
+		this.root.classList.add('dk-view');
+	}
+
+	mount(root) {
+		document.body.appendChild(this.root);
+		currentBuildingView = this;
+		this.viewDidLoad();
+		this.loaded = true;
+		while (this.elementQueue.length) {
+			this.addSubview(this.elementQueue.shift());
+		}
+	}
+
+	addSubview(view) {
+		if (!this.loaded) {
+			this.elementQueue.push(view);
+			return this;
+		}
+		// Check if view is html element or not
+		this.root.appendChild(view instanceof Element ? view.ref : view);
+		this.dispatchEvent(new CustomEvent('subviewAdded', {
+			detail: view instanceof Element ? view.ref : view
+		}));
+		return this;
+	}
+
+	useContainer() {
+		this.root.classList.add('container');
+	}
+
+	destroy() {
+		this.root.remove();
+		if (typeof this.destroy === 'function') this.destroy();
+		this.dispatchEvent(new Event('destroy'));
+		this.root = this.id = this.document = undefined;
+	}
+
+	viewDidLoad() {}
+
+	invoked() {}
+
+	static getInstance() {
+		let inst = this.prototype._instance;
+		if (!inst) {
+			inst = new this.prototype.constructor();
+			this.prototype._instance = inst;
+		}
+		return inst;
+	}
+
+	getInstance() {
+		return this;
+	}
+}
+
 export class IntegratedView extends SupportsEvents {
-	constructor(root_, doc = document) {
+	constructor(root_) {
 		super();
 		const root = this.root = typeof root_ === 'string' ? document.querySelector(root_) : root_;
 		if (!root) {
 			throw new Error('Root element is not defined');
 		}
 		document.body.appendChild(root);
-		this.document = doc || getDocument();
 		this.elementQueue = [];
 		this.loaded = false;
-		currentBuildingView = this;
 		if (document.readyState == 'interactive') {
 			this.viewDidLoad();
 			this.loaded = true;
@@ -422,7 +484,7 @@ export class IntegratedView extends SupportsEvents {
 				this.addSubview(this.elementQueue.shift());
 			}
 		} else {
-			this.document.addEventListener('DOMContentLoaded', () => {
+			document.addEventListener('DOMContentLoaded', () => {
 				this.viewDidLoad();
 				this.loaded = true;
 				while (this.elementQueue.length) {
@@ -478,12 +540,11 @@ export class IntegratedView extends SupportsEvents {
 }
 
 export class SimpleIntegratedView extends SupportsEvents {
-	constructor(root, doc = document) {
+	constructor(root) {
 		if (!root) {
 			throw new Error('Root element is not defined');
 		}
 		this.root = typeof root === 'string' ? document.querySelector(root) : root;
-		this.document = doc || getDocument();
 		if (document.readyState == 'interactive') {
 			this.viewDidLoad();
 			this.loaded = true;
