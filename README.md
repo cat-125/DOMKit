@@ -1,5 +1,7 @@
 # Documentation
 
+> **OUTDATED!!!**
+
 This repository contains several JavaScript files that provide functionality for easily creating elements on a web page without any additional HTML or CSS.
 
 # Table of Contents
@@ -15,22 +17,9 @@ This repository contains several JavaScript files that provide functionality for
   - [`SupportsEvents` class](#supportsevents-class)
   - [`Element` class](#element-class)
   - [`View` class](#view-class)
-  - [`UIButton` class](#uibutton-class)
-  - [`UIButton` class](#uibutton-class)
-  - [`UILabel` Class](#uilabel-class)
-  - [`UIContainer` Class](#uicontainer-class)
-  - [`UIBadge` Class](#uibadge-class)
-  - [`UICard` Class](#uicard-class)
-  - [`UIInput` Class](#uiinput-class)
-  - [`UISelect` Class](#uiselect-class)
-  - [`UIList` Class](#uilist-class)
-  - [`UISegment` Class](#uisegment-class)
-  - [`UIOverlay` Class](#uioverlay-class)
 
 
 ## Installation
-
-To use the functionality provided by these JavaScript files, you can include them in your HTML file using the `script` tag:
 
 ```html
 <script src="path/to/domkit.js"></script>
@@ -41,8 +30,6 @@ To use the functionality provided by these JavaScript files, you can include the
 # "Hello World" Example
 
 Here's an example of how to use the DOMKit to create a simple "Hello World" application:
-
-Sure! Here's an example using the `ExampleView` class:
 
 ```javascript
 import { View } from './domkit.js';

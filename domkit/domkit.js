@@ -1,7 +1,7 @@
-import { getDocument, animateElement, generateId } from './functions.js';
+import { getDocument, animateElement, generateId, camelCase } from './functions.js';
 
 const document = getDocument();
-let autoAdd = false
+let autoBuild = false;
 let currentBuildingView = null;
 let buildingQueue = [];
 
@@ -54,12 +54,23 @@ export class Element extends SupportsEvents {
 		this.ref.addEventListener('any', event => {
 			this.dispatchEvent(event);
 		});
-		if (autoAdd) {
+		if (autoBuild) {
 			if (currentBuildingView)
 				currentBuildingView.addSubview(this);
 			else
 				buildingQueue.push(this);
 		}
+	}
+
+	appendThis() {
+		if (currentBuildingView)
+			currentBuildingView.addSubview(this);
+		else
+			buildingQueue.push(this);
+	}
+
+	build() {
+		return this.outerHTML;
 	}
 
 	setText(content) {
@@ -82,12 +93,12 @@ export class Element extends SupportsEvents {
 		return this;
 	}
 
-	addText(text, position = 'beforeend') {
+	insertText(text, position = 'beforeend') {
 		this.ref.insertAdjacentText(position, text);
 		return this;
 	}
 
-	addHTML(content, position = 'beforeend') {
+	insertHTML(content, position = 'beforeend') {
 		this.ref.insertAdjacentHTML(position, content);
 		return this;
 	}
@@ -225,6 +236,16 @@ export class Element extends SupportsEvents {
 		this.ref.classList.remove(className);
 		return this;
 	}
+	
+	css(a, b) {
+		if (typeof a == 'object') {
+			for (const [prop, val] of Object.entries(a)) {
+				this.ref.style[camelCase(prop)] = new String(val);
+			}
+		} else {
+			this.ref.style[camelCase(a)] = new String(b);
+		}
+	}
 
 	fix({ top = null, bottom = null, left = null, right = null }) {
 		this.ref.style.position = 'fixed';
@@ -240,9 +261,9 @@ export class Element extends SupportsEvents {
 		return this;
 	}
 
-	fixBottom(dist = '1em') {
+	fixBottom(distBottom = '1em', dist = '1em') {
 		return this.fix({
-			bottom: dist,
+			bottom: distBottom,
 			left: dist,
 			right: dist
 		});
@@ -266,6 +287,45 @@ export class Element extends SupportsEvents {
 	textColor(val) {
 		if (val) this.ref.style.color = val;
 		else return this.ref.getComputedStyle().color;
+		return this;
+	}
+	bold() {
+		this.ref.style.fontWeight = 'bold';
+		return this;
+	}
+	font(val) {
+		this.ref.style.fontFamily = val;
+		return this;
+	}
+	fontSize(val) {
+		this.ref.style.fontSize = val;
+		return this;
+	}
+	height(val) {
+		if (val) this.ref.style.height = val;
+		else return this.ref.getComputedStyle().height;
+		return this;
+	}
+	width(val) {
+		if (val) this.ref.style.width = val;
+		else return this.ref.getComputedStyle().width;
+		return this;
+	}
+	size(val) {
+		this.addClass('s-' + val);
+		return this;
+	}
+	borderRadius(val) {
+		this.ref.style.borderRadius = val;
+		return this;
+	}
+	centered() {
+		this.css({
+			textAlign: 'center',
+			boxAlign: 'center',
+			alignSelf: 'center',
+			alignItems: 'center'
+		});
 		return this;
 	}
 
@@ -298,6 +358,7 @@ export class View extends SupportsEvents {
 		}
 		this.id = generateId(16);
 		root.id = this.id;
+		root.classList.add('dk-view');
 	}
 
 	addSubview(view) {
@@ -326,6 +387,8 @@ export class View extends SupportsEvents {
 
 	viewDidLoad() {}
 
+	invoked() {}
+
 	static getInstance() {
 		let inst = this.prototype._instance;
 		if (!inst) {
@@ -334,12 +397,16 @@ export class View extends SupportsEvents {
 		}
 		return inst;
 	}
+
+	getInstance() {
+		return this;
+	}
 }
 
 export class IntegratedView extends SupportsEvents {
-	constructor(root, doc = document) {
+	constructor(root_, doc = document) {
 		super();
-		this.root = typeof root === 'string' ? document.querySelector(root) : root;
+		const root = this.root = typeof root_ === 'string' ? document.querySelector(root_) : root_;
 		if (!root) {
 			throw new Error('Root element is not defined');
 		}
@@ -365,6 +432,7 @@ export class IntegratedView extends SupportsEvents {
 		}
 		this.id = generateId(16);
 		root.id = this.id;
+		root.classList.add('dk-view');
 	}
 
 	addSubview(view) {
@@ -393,6 +461,8 @@ export class IntegratedView extends SupportsEvents {
 
 	viewDidLoad() {}
 
+	invoked() {}
+
 	static getInstance() {
 		let inst = this.prototype._instance;
 		if (!inst) {
@@ -400,6 +470,10 @@ export class IntegratedView extends SupportsEvents {
 			this.prototype._instance = inst;
 		}
 		return inst;
+	}
+
+	getInstance() {
+		return this;
 	}
 }
 
@@ -419,6 +493,7 @@ export class SimpleIntegratedView extends SupportsEvents {
 				this.loaded = true;
 			});
 		}
+		this.root.classList.add('dk-view');
 	}
 
 	addSubview(view) {
@@ -442,7 +517,9 @@ export class SimpleIntegratedView extends SupportsEvents {
 	}
 
 	viewDidLoad() {}
-	
+
+	invoked() {}
+
 	getInstance() {
 		return this;
 	}
@@ -467,7 +544,7 @@ export class ViewManager {
 		this.views[view.id] = view;
 	}
 
-	switchTo(view) {
+	switchTo(view, ...args) {
 		const viewId = view.getInstance().id;
 		if (!this.views[viewId]) {
 			throw new Error(`View with id ${viewId} not found`);
@@ -488,6 +565,7 @@ export class ViewManager {
 			gsap.fromTo(newView.root, { opacity: 0 }, { opacity: 1, duration: 0.15 });
 		}
 		this.currentView = newView;
+		newView.invoked(...args);
 	}
 
 	removeView(viewId) {
@@ -513,6 +591,12 @@ export class ViewManager {
 	}
 }
 
-export function useAutoBuild() {
-	autoAdd = true;
+export function useAutoBuild(v = true) {
+	autoBuild = v;
 }
+
+export function getAutoBuild() {
+	return autoBuild;
+}
+
+export const viewManager = new ViewManager();

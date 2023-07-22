@@ -54,3 +54,11 @@ export function generateId(length, _chars = '') {
 	}
 	return result;
 }
+
+export function camelCase(t) {
+	return t.replace(/\-(\w)/g,
+		function(b, a) {
+			return a[0].toUpperCase() + a.slice(1, a.length).toLowerCase();
+		}
+	);
+}
