@@ -368,7 +368,7 @@ export class View extends SupportsEvents {
 		}
 		// Check if view is html element or not
 		this.root.appendChild(view instanceof Element ? view.ref : view);
-		this.dispatchEvent(new CustomEvent('subViewAdded', {
+		this.dispatchEvent(new CustomEvent('subviewAdded', {
 			detail: view instanceof Element ? view.ref : view
 		}));
 		return this;
@@ -380,7 +380,7 @@ export class View extends SupportsEvents {
 
 	destroy() {
 		this.root.remove();
-		if (typeof this.onDestroy === 'function') this.onDestroy();
+		if (typeof this.destroy === 'function') this.destroy();
 		this.dispatchEvent(new Event('destroy'));
 		this.root = this.id = this.document = undefined;
 	}
@@ -442,7 +442,7 @@ export class IntegratedView extends SupportsEvents {
 		}
 		// Check if view is html element or not
 		this.root.appendChild(view instanceof Element ? view.ref : view);
-		this.dispatchEvent(new CustomEvent('subViewAdded', {
+		this.dispatchEvent(new CustomEvent('subviewAdded', {
 			detail: view instanceof Element ? view.ref : view
 		}));
 		return this;
@@ -499,7 +499,7 @@ export class SimpleIntegratedView extends SupportsEvents {
 	addSubview(view) {
 		// Check if view is html element or not
 		this.root.appendChild(view instanceof Element ? view.el : view);
-		this.dispatchEvent(new CustomEvent('subViewAdded', {
+		this.dispatchEvent(new CustomEvent('subviewAdded', {
 			detail: view instanceof Element ? view.el : view
 		}));
 		return this;

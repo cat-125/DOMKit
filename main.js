@@ -20,7 +20,7 @@ class MainView extends View {
 			.onClick(btn => btn.setText(++counter));
 
 		(new UI.ButtonLink('Go to second view'))
-		.onClick(e => vm.switchTo(View2));
+		//.onClick(e => vm.switchTo(View2));
 
 		(new UI.Button('Bottom fixed'))
 		.primary()

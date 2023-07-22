@@ -1,5 +1,16 @@
 import { Element, viewManager, getAutoBuild, useAutoBuild } from './domkit.js';
 
+let _abtmp = false;
+
+function pauseAB() {
+	_abtmp = getAutoBuild();
+	useAutoBuild(false);
+}
+
+function resumeAB() {
+	useAutoBuild(_abtmp);
+}
+
 export function importCSSFiles(cssFileUrls) {
 	for (const cssFileUrl of cssFileUrls)
 		if (!document.querySelector(`link[href="${cssFileUrl}"]`)) {
@@ -119,9 +130,10 @@ export class ButtonLink extends Element {
 }
 
 export class Link extends Element {
-	constructor(text) {
+	constructor(text, href) {
 		super('a');
 		if (text) this.setText(text);
+		if (href) this.href(href);
 	}
 
 	href(val) {
@@ -140,10 +152,13 @@ export class Link extends Element {
 }
 
 export class Input extends Element {
-	constructor() {
+	constructor(placeholder) {
 		super('div');
+		pauseAB();
 		const input = this.input = new Element('input');
+		resumeAB();
 		this.addClass('input').addSubview(input);
+		if (placeholder) this.placeholder(placeholder);
 	}
 
 	val(val) {
@@ -158,9 +173,27 @@ export class Input extends Element {
 }
 
 export class Select extends Element {
-	constructor() {
+	constructor(items) {
 		super('select');
 		this.addClass('select');
+		if (items) items.forEach(item => this.addItem(item));
+	}
+
+	addItem(text, val) {
+		pauseAB();
+		const item = new Element('option');
+		item.setText(text).setAttr('value', val);
+		this.addSubview(item);
+		resumeAB();
+		return this;
+	}
+
+	removeItem(id) {
+		const item = this.ref.querySelector(`option:nth-child(${id})`);
+		if (item) {
+			this.ref.removeChild(item);
+		}
+		return this;
 	}
 }
 
@@ -207,6 +240,10 @@ export class Badge extends Element {
 		this.addClass('badge');
 		if (text) this.setText(text);
 	}
+
+	outline() {
+		this.addClass('oitline');
+	}
 }
 
 /* Layouts */
@@ -227,14 +264,13 @@ export class HorizontalLayout extends Element {
 
 export class NavigationMenu extends Element {
 	constructor({
-		backView = null,
 		titleText = '',
-		backText = '< Back',
-		canGoBack = false
+		canGoBack = false,
+		backView = null,
+		backText = '< Back'
 	}) {
 		super('div');
-		let _tmp = getAutoBuild();
-		useAutoBuild(false);
+		pauseAB();
 		const title = this.title = (new Text(titleText)).bold();
 		this
 			.addClass('top-menu')
@@ -251,7 +287,7 @@ export class NavigationMenu extends Element {
 			});
 		} else this.addClass('cols-1');
 		this.addSubview(title);
-		useAutoBuild(_tmp);
+		resumeAB();
 	}
 
 	setTitle(text) {
@@ -294,9 +330,10 @@ export class Card extends Element {
 }
 
 export class List extends Element {
-	constructor() {
+	constructor(items) {
 		super('div');
 		this.addClass('list');
+		if (items) items.forEach(item => this.addItem(item));
 	}
 
 	addItem(view) {
